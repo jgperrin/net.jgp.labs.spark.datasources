@@ -24,9 +24,9 @@ public class PhotoMetadataIngestionApp {
                 .option("extensions", "jpg,jpeg")
                 .load(importDirectory);
         
-        System.out.println("I have imported " + df.count() + " photos.");
+        //System.out.println("I have imported " + df.count() + " photos.");
         df.printSchema();
-        df.show();
+        //df.show();
         
         return true;
     }

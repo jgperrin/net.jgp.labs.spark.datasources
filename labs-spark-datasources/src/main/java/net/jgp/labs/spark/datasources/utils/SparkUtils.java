@@ -1,71 +1,147 @@
 package net.jgp.labs.spark.datasources.utils;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StringType;
+import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.jgp.labs.spark.datasources.model.SparkColumn;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Member;
-import static java.lang.System.out;
-
-enum ClassMember {
-    CONSTRUCTOR, FIELD, METHOD, CLASS, ALL
-}
-
 public class SparkUtils {
+    private static Logger log = LoggerFactory.getLogger(SparkUtils.class);
 
     public static StructType getSchemaFromBean(Class<?> c) {
+        List<StructField> sfl = new ArrayList<>();
 
         Method[] methods = c.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
-            String name = method.getName().toLowerCase();
-            if (name.startsWith("get")) {
-                SparkColumn sparkColumn = method.getAnnotation(SparkColumn.class);
-                String columnName;
-                DataType dataType;
-                boolean nullable;
-                if (sparkColumn == null) {
-                    columnName = "";
-                    dataType = DataTypes.StringType;
-                    nullable = false;
-                } else {
-                    columnName = sparkColumn.name();
-                    try {
-                        dataType = sparkColumn.type().newInstance();
-                    } catch (InstantiationException e) {
-                        // TODO Auto-generated catch block
-                        dataType = DataTypes.StringType;
-                    } catch (IllegalAccessException e) {
-                        // TODO Auto-generated catch block
-                        dataType = DataTypes.StringType;
-                    }
-                    nullable = sparkColumn.nullable();
-                }
+            String methodName = method.getName();
+            if (methodName.toLowerCase().startsWith("get") == false) {
+                continue;
             }
+
+            // We have a public method starting with get
+            String columnName;
+            DataType dataType;
+            boolean nullable;
+            SparkColumn sparkColumn = method.getAnnotation(SparkColumn.class);
+            if (sparkColumn == null) {
+                log.debug("No annotation for method {}", methodName);
+                columnName = "";
+                dataType = getDataTypeFromReturnType(method);
+                nullable = true;
+            } else {
+                columnName = sparkColumn.name();
+                log.debug("Annotation for method {}, column name is {}",
+                        methodName,
+                        columnName);
+
+                switch (sparkColumn.type().getSimpleName()) {
+                case "StringType":
+                    dataType = DataTypes.StringType;
+                    break;
+                case "BinaryType":
+                    dataType = DataTypes.BinaryType;
+                    break;
+                case "BooleanType":
+                    dataType = DataTypes.BooleanType;
+                    break;
+                case "DateType":
+                    dataType = DataTypes.DateType;
+                    break;
+                case "TimestampType":
+                    dataType = DataTypes.TimestampType;
+                    break;
+                case "CalendarIntervalType":
+                    dataType = DataTypes.CalendarIntervalType;
+                    break;
+                case "DoubleType":
+                    dataType = DataTypes.DoubleType;
+                    break;
+                case "FloatType":
+                    dataType = DataTypes.FloatType;
+                    break;
+                case "ByteType":
+                    dataType = DataTypes.ByteType;
+                    break;
+                case "IntegerType":
+                    dataType = DataTypes.IntegerType;
+                    break;
+                case "LongType":
+                    dataType = DataTypes.LongType;
+                    break;
+                case "ShortType":
+                    dataType = DataTypes.ShortType;
+                    break;
+                case "NullType":
+                    dataType = DataTypes.NullType;
+                    break;
+                default:
+                    log.debug("Will infer data type from return type for column {}",
+                            columnName);
+                    dataType = getDataTypeFromReturnType(method);
+                }
+
+                nullable = sparkColumn.nullable();
+            }
+            sfl.add(DataTypes.createStructField(
+                    buildColumnName(columnName, methodName), dataType, nullable));
+
         }
 
-        return null;
+        StructType schema = DataTypes.createStructType(sfl);
+        return schema;
     }
 
-    private static void printMembers(Member[] mbrs, String s) {
-        out.format("%s:%n", s);
-        for (Member mbr : mbrs) {
-            if (mbr instanceof Field)
-                out.format("  %s%n", ((Field) mbr).toGenericString());
-            else if (mbr instanceof Constructor)
-                out.format("  %s%n", ((Constructor) mbr).toGenericString());
-            else if (mbr instanceof Method)
-                out.format("  %s%n", ((Method) mbr).toGenericString());
+    private static DataType getDataTypeFromReturnType(Method method) {
+        String typeName = method.getReturnType().getSimpleName();
+        switch (typeName) {
+        case "int":
+        case "Integer":
+            return DataTypes.IntegerType;
+        case "long":
+        case "Long":
+            return DataTypes.LongType;
+        case "float":
+        case "Float":
+            return DataTypes.FloatType;
+        case "boolean":
+        case "Boolean":
+            return DataTypes.BooleanType;
+        case "double":
+        case "Double":
+            return DataTypes.DoubleType;
+        case "String":
+            return DataTypes.StringType;
+        case "Date":
+            return DataTypes.TimestampType;
+        case "short":
+        case "Short":
+            return DataTypes.ShortType;
+        case "Object":
+            return DataTypes.BinaryType;
+        default:
+            log.debug("Using default for type [{}]", typeName);
+            return DataTypes.BinaryType;
         }
-        if (mbrs.length == 0)
-            out.format("  -- No %s --%n", s);
-        out.format("%n");
+    }
+
+    private static String buildColumnName(String columnName, String methodName) {
+        if (columnName.length() > 0) {
+            return columnName;
+        }
+        columnName = methodName.substring(3);
+        if (columnName.length() == 0) {
+            return "_c0";
+        }
+        return columnName;
     }
 
 }

@@ -1,13 +1,16 @@
 package net.jgp.labs.spark.datasources.model;
 
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.StringType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
+import org.apache.spark.sql.types.DataType;
+
+@Retention(RetentionPolicy.RUNTIME)
 public @interface SparkColumn {
 
     String name() default "";
 
-    Class<? extends DataType> type() default StringType.class;
+    Class<? extends DataType> type() default DataType.class;
 
     boolean nullable() default true;
 }
