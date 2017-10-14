@@ -24,6 +24,7 @@ public class PhotoMetadata implements Serializable {
     /**
      * @return the dateTaken
      */
+    @SparkColumn(name = "Date")
     public Date getDateTaken() {
         return dateTaken;
     }

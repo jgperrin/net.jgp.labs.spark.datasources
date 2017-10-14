@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 
-public class SparkUtils {
-    private static Logger log = LoggerFactory.getLogger(SparkUtils.class);
+public class SparkBeanUtils {
+    private static Logger log = LoggerFactory.getLogger(SparkBeanUtils.class);
 
     public static StructType getSchemaFromBean(Class<?> c) {
         List<StructField> sfl = new ArrayList<>();

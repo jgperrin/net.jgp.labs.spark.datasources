@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
-import net.jgp.labs.spark.datasources.x.utils.SparkUtils;
+import net.jgp.labs.spark.datasources.x.utils.SparkBeanUtils;
 
 public class ExifDirectoryRelation extends BaseRelation
         implements Serializable, TableScan {
@@ -35,17 +35,10 @@ public class ExifDirectoryRelation extends BaseRelation
         // possible.
         List<PhotoMetadata> table = collectData();
 
-        // @SuppressWarnings("resource") // cannot be closed here, done elsewhere
-        // JavaSparkContext sparkContext = new
-        // JavaSparkContext(sqlContext.sparkContext());
-        // JavaRDD<Row> rowRDD = sparkContext.parallelize(table)
-        // .map(row -> RowFactory.create(Encoder.s.row.));
-
-        // return rowRDD.rdd();
-
+        @SuppressWarnings("resource")
         JavaSparkContext sparkContext = new JavaSparkContext(sqlContext.sparkContext());
         JavaRDD<Row> rowRDD = sparkContext.parallelize(table)
-                .map(photo -> SparkUtils.getRowFromBean(schema(), photo));
+                .map(photo -> SparkBeanUtils.getRowFromBean(schema(), photo));
 
         return rowRDD.rdd();
     }
@@ -65,7 +58,7 @@ public class ExifDirectoryRelation extends BaseRelation
     @Override
     public StructType schema() {
         if (schema == null) {
-            schema = SparkUtils.getSchemaFromBean(PhotoMetadata.class);
+            schema = SparkBeanUtils.getSchemaFromBean(PhotoMetadata.class);
         }
         return schema;
     }
