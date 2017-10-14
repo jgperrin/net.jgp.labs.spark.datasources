@@ -1,10 +1,13 @@
 package net.jgp.labs.spark.datasources.x.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import net.jgp.labs.spark.datasources.x.utils.SparkColumn;
 
-public class PhotoMetadata {
+public class PhotoMetadata implements Serializable {
+    private static final long serialVersionUID = -2589804417011601051L;
+
     private Date dateTaken;
     private String directory;
     private String extension;

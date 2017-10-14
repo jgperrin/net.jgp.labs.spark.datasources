@@ -1,15 +1,21 @@
 package net.jgp.labs.spark.datasources.x.utils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 
 public class SparkUtils {
     private static Logger log = LoggerFactory.getLogger(SparkUtils.class);
@@ -140,6 +146,40 @@ public class SparkUtils {
             return "_c0";
         }
         return columnName;
+    }
+
+    public static Row getRowFromBean(StructType structType, Object bean) {
+        List<Object> cells = new ArrayList<>();
+        String[] fieldName = structType.fieldNames();
+
+        Method method;
+        for (int i = 0; i < fieldName.length; i++) {
+            try {
+                method = bean.getClass().getMethod("get" + fieldName[i]);
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            }
+            try {
+                cells.add(method.invoke(bean));
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        Row row = RowFactory.create(cells.toArray());
+        return row;
     }
 
 }

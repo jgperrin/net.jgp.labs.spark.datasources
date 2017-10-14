@@ -1,13 +1,21 @@
 package net.jgp.labs.spark.datasources.x.ds.exif;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.TableScan;
 import org.apache.spark.sql.types.StructType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 import net.jgp.labs.spark.datasources.x.utils.SparkUtils;
@@ -15,17 +23,51 @@ import net.jgp.labs.spark.datasources.x.utils.SparkUtils;
 public class ExifDirectoryRelation extends BaseRelation
         implements Serializable, TableScan {
     private static final long serialVersionUID = 4598175080399877334L;
+    private static Logger log = LoggerFactory.getLogger(ExifDirectoryRelation.class);
     private SQLContext sqlContext;
+    private StructType schema = null;
 
     @Override
     public RDD<Row> buildScan() {
+        log.debug("-> buildScan()");
+
+        // I have isolated the work to a method to keep the plumbing code as simple as
+        // possible.
+        List<PhotoMetadata> table = collectData();
+
+        // @SuppressWarnings("resource") // cannot be closed here, done elsewhere
+        // JavaSparkContext sparkContext = new
+        // JavaSparkContext(sqlContext.sparkContext());
+        // JavaRDD<Row> rowRDD = sparkContext.parallelize(table)
+        // .map(row -> RowFactory.create(Encoder.s.row.));
+
+        // return rowRDD.rdd();
+
+        JavaSparkContext sparkContext = new JavaSparkContext(sqlContext.sparkContext());
+        JavaRDD<Row> rowRDD = sparkContext.parallelize(table)
+                .map(photo -> SparkUtils.getRowFromBean(schema(), photo));
+
+        return rowRDD.rdd();
+    }
+
+    private List<PhotoMetadata> collectData() {
         // TODO Auto-generated method stub
-        return null;
+        List<PhotoMetadata> list = new ArrayList<PhotoMetadata>();
+        PhotoMetadata photo = new PhotoMetadata();
+        photo.setFilename("001");
+        list.add(photo);
+        photo = new PhotoMetadata();
+        photo.setFilename("002");
+        list.add(photo);
+        return list;
     }
 
     @Override
     public StructType schema() {
-        return SparkUtils.getSchemaFromBean(PhotoMetadata.class);
+        if (schema == null) {
+            schema = SparkUtils.getSchemaFromBean(PhotoMetadata.class);
+        }
+        return schema;
     }
 
     @Override
