@@ -18,7 +18,7 @@ public class PhotoMetadataIngestionApp {
         String importDirectory = "/Users/jgp/Pictures/All Photos/2010-2019/2016";
         
         Dataset<Row> df = spark.read()
-                .format("net.jgp.labs.spark.datasources.x.ExifDirectoryDataSource")
+                .format("net.jgp.labs.spark.datasources.x.ds.exif.ExifDirectoryDataSource")
                 .option("recursive", "false")
                 .option("limit", "500")
                 .option("extensions", "jpg,jpeg")

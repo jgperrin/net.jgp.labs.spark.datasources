@@ -1,6 +1,8 @@
-package net.jgp.labs.spark.datasources.model;
+package net.jgp.labs.spark.datasources.x.model;
 
 import java.util.Date;
+
+import net.jgp.labs.spark.datasources.x.utils.SparkColumn;
 
 public class PhotoMetadata {
     private Date dateTaken;

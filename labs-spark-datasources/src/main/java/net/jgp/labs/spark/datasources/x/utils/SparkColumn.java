@@ -1,4 +1,4 @@
-package net.jgp.labs.spark.datasources.model;
+package net.jgp.labs.spark.datasources.x.utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

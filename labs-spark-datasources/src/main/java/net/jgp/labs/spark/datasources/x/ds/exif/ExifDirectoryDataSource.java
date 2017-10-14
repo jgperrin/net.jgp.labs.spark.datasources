@@ -1,10 +1,13 @@
-package net.jgp.labs.spark.datasources.x;
+package net.jgp.labs.spark.datasources.x.ds.exif;
 
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.RelationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.jgp.labs.spark.datasources.x.utils.K;
+
 import static scala.collection.JavaConverters.mapAsJavaMapConverter;
 import scala.collection.immutable.Map;
 

@@ -1,4 +1,4 @@
-package net.jgp.labs.spark.datasources.x;
+package net.jgp.labs.spark.datasources.x.utils;
 
 public abstract class K {
 

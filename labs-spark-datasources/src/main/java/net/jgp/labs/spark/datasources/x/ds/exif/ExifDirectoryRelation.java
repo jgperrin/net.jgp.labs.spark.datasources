@@ -1,4 +1,4 @@
-package net.jgp.labs.spark.datasources.x;
+package net.jgp.labs.spark.datasources.x.ds.exif;
 
 import java.io.Serializable;
 
@@ -9,8 +9,8 @@ import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.TableScan;
 import org.apache.spark.sql.types.StructType;
 
-import net.jgp.labs.spark.datasources.model.PhotoMetadata;
-import net.jgp.labs.spark.datasources.utils.SparkUtils;
+import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
+import net.jgp.labs.spark.datasources.x.utils.SparkUtils;
 
 public class ExifDirectoryRelation extends BaseRelation
         implements Serializable, TableScan {
