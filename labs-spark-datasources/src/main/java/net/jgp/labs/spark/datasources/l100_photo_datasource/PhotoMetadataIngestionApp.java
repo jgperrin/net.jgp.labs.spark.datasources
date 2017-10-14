@@ -12,7 +12,7 @@ public class PhotoMetadataIngestionApp {
 
     private boolean start() {
         SparkSession spark = SparkSession.builder()
-                .appName("CSV to Dataset")
+                .appName("EXIF to Dataset")
                 .master("local[*]").getOrCreate();
         
         String importDirectory = "/Users/jgp/Pictures/All Photos/2010-2019/2016";

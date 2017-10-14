@@ -9,6 +9,9 @@ import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.TableScan;
 import org.apache.spark.sql.types.StructType;
 
+import net.jgp.labs.spark.datasources.model.PhotoMetadata;
+import net.jgp.labs.spark.datasources.utils.SparkUtils;
+
 public class ExifDirectoryRelation extends BaseRelation
         implements Serializable, TableScan {
     private static final long serialVersionUID = 4598175080399877334L;
@@ -22,8 +25,7 @@ public class ExifDirectoryRelation extends BaseRelation
 
     @Override
     public StructType schema() {
-        // TODO Auto-generated method stub
-        return null;
+        return SparkUtils.getSchemaFromBean(PhotoMetadata.class);
     }
 
     @Override
