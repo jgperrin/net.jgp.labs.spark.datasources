@@ -7,9 +7,7 @@ import java.util.List;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.sources.BaseRelation;
 import org.apache.spark.sql.sources.TableScan;
@@ -45,8 +43,16 @@ public class ExifDirectoryRelation extends BaseRelation
         return rowRDD.rdd();
     }
 
+    /**
+     * Interface with the real world: the "plumbing" between Spark and existing
+     * data, in our case the classes in charge of reading the information from the
+     * photos.
+     * 
+     * The list of photos will be "mapped" and transformed into a Row.
+     * 
+     * @return
+     */
     private List<PhotoMetadata> collectData() {
-        // TODO Auto-generated method stub
         List<PhotoMetadata> list = new ArrayList<PhotoMetadata>();
         PhotoMetadata photo = new PhotoMetadata();
         photo.setFilename("001");
