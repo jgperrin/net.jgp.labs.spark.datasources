@@ -1,12 +1,16 @@
 package net.jgp.labs.spark.datasources.x.utils;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.spark.sql.types.StructType;
 
+/**
+ * Stores the Spark schema as well as extra information we cannot add to the (Spark) schema.
+ * 
+ * @author jgp
+ */
 public class Schema implements Serializable{
     private static final long serialVersionUID = 2376325490075130182L;
     
