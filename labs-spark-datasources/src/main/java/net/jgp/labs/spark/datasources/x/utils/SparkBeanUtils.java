@@ -101,7 +101,7 @@ public class SparkBeanUtils {
             String finalColumnName = buildColumnName(columnName, methodName);
             sfl.add(DataTypes.createStructField(finalColumnName, dataType, nullable));
             col.setColumnName(finalColumnName);
-            
+
             schema.add(col);
         }
 
@@ -156,66 +156,36 @@ public class SparkBeanUtils {
 
     public static Row getRowFromBean(Schema schema, Object bean) {
         List<Object> cells = new ArrayList<>();
-        
-//        Method method = schema.getMeth
 
-      String[] fieldName = schema.getSparkSchema().fieldNames();
-    for (int i = 0; i < fieldName.length; i++) {
-        String methodName = schema.getMethodName(fieldName[i]);
-        Method method;
-        try {
-          method = bean.getClass().getMethod(methodName);
-      } catch (NoSuchMethodException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-          return null;
-      } catch (SecurityException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-          return null;
-      }
-        try {
-            cells.add(method.invoke(bean));
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        String[] fieldName = schema.getSparkSchema().fieldNames();
+        for (int i = 0; i < fieldName.length; i++) {
+            String methodName = schema.getMethodName(fieldName[i]);
+            Method method;
+            try {
+                method = bean.getClass().getMethod(methodName);
+            } catch (NoSuchMethodException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            }
+            try {
+                cells.add(method.invoke(bean));
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-    }
-    
-//        String[] fieldName = schema.fieldNames();
-//
-//        Method method;
-//        for (int i = 0; i < fieldName.length; i++) {
-//            try {
-//                method = bean.getClass().getMethod("get" + fieldName[i]);
-//            } catch (NoSuchMethodException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//                return null;
-//            } catch (SecurityException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//                return null;
-//            }
-//            try {
-//                cells.add(method.invoke(bean));
-//            } catch (IllegalAccessException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (IllegalArgumentException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (InvocationTargetException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//        }
+
         Row row = RowFactory.create(cells.toArray());
         return row;
     }
