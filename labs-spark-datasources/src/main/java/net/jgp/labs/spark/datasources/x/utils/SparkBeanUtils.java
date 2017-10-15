@@ -3,7 +3,6 @@ package net.jgp.labs.spark.datasources.x.utils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.spark.sql.Row;
@@ -14,8 +13,6 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 
 public class SparkBeanUtils {
     private static Logger log = LoggerFactory.getLogger(SparkBeanUtils.class);
