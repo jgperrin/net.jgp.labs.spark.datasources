@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
+import net.jgp.labs.spark.datasources.x.utils.Schema;
 import net.jgp.labs.spark.datasources.x.utils.SparkBeanUtils;
 
 public class ExifDirectoryRelation extends BaseRelation
@@ -25,11 +26,12 @@ public class ExifDirectoryRelation extends BaseRelation
     private static final long serialVersionUID = 4598175080399877334L;
     private static Logger log = LoggerFactory.getLogger(ExifDirectoryRelation.class);
     private SQLContext sqlContext;
-    private StructType schema = null;
+    private Schema schema = null;
 
     @Override
     public RDD<Row> buildScan() {
         log.debug("-> buildScan()");
+        schema();
 
         // I have isolated the work to a method to keep the plumbing code as simple as
         // possible.
@@ -38,7 +40,7 @@ public class ExifDirectoryRelation extends BaseRelation
         @SuppressWarnings("resource")
         JavaSparkContext sparkContext = new JavaSparkContext(sqlContext.sparkContext());
         JavaRDD<Row> rowRDD = sparkContext.parallelize(table)
-                .map(photo -> SparkBeanUtils.getRowFromBean(schema(), photo));
+                .map(photo -> SparkBeanUtils.getRowFromBean(schema, photo));
 
         return rowRDD.rdd();
     }
@@ -60,7 +62,7 @@ public class ExifDirectoryRelation extends BaseRelation
         if (schema == null) {
             schema = SparkBeanUtils.getSchemaFromBean(PhotoMetadata.class);
         }
-        return schema;
+        return schema.getSparkSchema();
     }
 
     @Override

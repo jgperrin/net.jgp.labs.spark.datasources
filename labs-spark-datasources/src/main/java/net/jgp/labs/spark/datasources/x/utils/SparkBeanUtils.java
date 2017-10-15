@@ -20,7 +20,9 @@ import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 public class SparkBeanUtils {
     private static Logger log = LoggerFactory.getLogger(SparkBeanUtils.class);
 
-    public static StructType getSchemaFromBean(Class<?> c) {
+    public static Schema getSchemaFromBean(Class<?> c) {
+        Schema schema = new Schema();
+        SchemaColumn col;
         List<StructField> sfl = new ArrayList<>();
 
         Method[] methods = c.getDeclaredMethods();
@@ -30,6 +32,9 @@ public class SparkBeanUtils {
             if (methodName.toLowerCase().startsWith("get") == false) {
                 continue;
             }
+
+            col = new SchemaColumn();
+            col.setMethodName(methodName);
 
             // We have a public method starting with get
             String columnName;
@@ -95,12 +100,16 @@ public class SparkBeanUtils {
 
                 nullable = sparkColumn.nullable();
             }
-            sfl.add(DataTypes.createStructField(
-                    buildColumnName(columnName, methodName), dataType, nullable));
 
+            String finalColumnName = buildColumnName(columnName, methodName);
+            sfl.add(DataTypes.createStructField(finalColumnName, dataType, nullable));
+            col.setColumnName(finalColumnName);
+            
+            schema.add(col);
         }
 
-        StructType schema = DataTypes.createStructType(sfl);
+        StructType sparkSchema = DataTypes.createStructType(sfl);
+        schema.setSparkSchema(sparkSchema);
         return schema;
     }
 
@@ -148,36 +157,68 @@ public class SparkBeanUtils {
         return columnName;
     }
 
-    public static Row getRowFromBean(StructType structType, Object bean) {
+    public static Row getRowFromBean(Schema schema, Object bean) {
         List<Object> cells = new ArrayList<>();
-        String[] fieldName = structType.fieldNames();
+        
+//        Method method = schema.getMeth
 
+      String[] fieldName = schema.getSparkSchema().fieldNames();
+    for (int i = 0; i < fieldName.length; i++) {
+        String methodName = schema.getMethodName(fieldName[i]);
         Method method;
-        for (int i = 0; i < fieldName.length; i++) {
-            try {
-                method = bean.getClass().getMethod("get" + fieldName[i]);
-            } catch (NoSuchMethodException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            } catch (SecurityException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
-            try {
-                cells.add(method.invoke(bean));
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        try {
+          method = bean.getClass().getMethod(methodName);
+      } catch (NoSuchMethodException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+          return null;
+      } catch (SecurityException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+          return null;
+      }
+        try {
+            cells.add(method.invoke(bean));
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+    }
+    
+//        String[] fieldName = schema.fieldNames();
+//
+//        Method method;
+//        for (int i = 0; i < fieldName.length; i++) {
+//            try {
+//                method = bean.getClass().getMethod("get" + fieldName[i]);
+//            } catch (NoSuchMethodException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//                return null;
+//            } catch (SecurityException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//                return null;
+//            }
+//            try {
+//                cells.add(method.invoke(bean));
+//            } catch (IllegalAccessException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (IllegalArgumentException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            } catch (InvocationTargetException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
         Row row = RowFactory.create(cells.toArray());
         return row;
     }
