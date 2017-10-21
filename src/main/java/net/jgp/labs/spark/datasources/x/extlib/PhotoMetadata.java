@@ -1,17 +1,20 @@
-package net.jgp.labs.spark.datasources.x.model;
+package net.jgp.labs.spark.datasources.x.extlib;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.nio.file.attribute.FileTime;
+import java.sql.Timestamp;
 
 import net.jgp.labs.spark.datasources.x.utils.SparkColumn;
 
 public class PhotoMetadata implements Serializable {
     private static final long serialVersionUID = -2589804417011601051L;
 
-    private Date dateTaken;
+    private Timestamp dateTaken;
     private String directory;
     private String extension;
-    private Date fileDate;
+    private Timestamp fileCreationDate;
+    private Timestamp fileLastAccessDate;
+    private Timestamp fileLastModifiedDate;
     private String filename;
     private float geoX;
     private float geoY;
@@ -25,7 +28,7 @@ public class PhotoMetadata implements Serializable {
      * @return the dateTaken
      */
     @SparkColumn(name = "Date")
-    public Date getDateTaken() {
+    public Timestamp getDateTaken() {
         return dateTaken;
     }
 
@@ -44,10 +47,24 @@ public class PhotoMetadata implements Serializable {
     }
 
     /**
-     * @return the fileDate
+     * @return the fileCreationDate
      */
-    public Date getFileDate() {
-        return fileDate;
+    public Timestamp getFileCreationDate() {
+        return fileCreationDate;
+    }
+
+    /**
+     * @return the fileLastAccessDate
+     */
+    public Timestamp getFileLastAccessDate() {
+        return fileLastAccessDate;
+    }
+
+    /**
+     * @return the fileLastModifiedDate
+     */
+    public Timestamp getFileLastModifiedDate() {
+        return fileLastModifiedDate;
     }
 
     /**
@@ -111,7 +128,7 @@ public class PhotoMetadata implements Serializable {
      * @param dateTaken
      *            the dateTaken to set
      */
-    public void setDateTaken(Date dateTaken) {
+    public void setDateTaken(Timestamp dateTaken) {
         this.dateTaken = dateTaken;
     }
 
@@ -132,11 +149,39 @@ public class PhotoMetadata implements Serializable {
     }
 
     /**
-     * @param fileDate
-     *            the fileDate to set
+     * @param fileCreationDate
+     *            the fileCreationDate to set
      */
-    public void setFileDate(Date fileDate) {
-        this.fileDate = fileDate;
+    public void setFileCreationDate(Timestamp fileCreationDate) {
+        this.fileCreationDate = fileCreationDate;
+    }
+
+    public void setFileCreationDate(FileTime creationTime) {
+        setFileCreationDate(new Timestamp(creationTime.toMillis()));
+    }
+
+    /**
+     * @param fileLastAccessDate
+     *            the fileLastAccessDate to set
+     */
+    public void setFileLastAccessDate(Timestamp fileLastAccessDate) {
+        this.fileLastAccessDate = fileLastAccessDate;
+    }
+
+    public void setFileLastAccessDate(FileTime lastAccessTime) {
+        setFileLastAccessDate(new Timestamp(lastAccessTime.toMillis()));
+    }
+
+    /**
+     * @param fileLastModifiedDate
+     *            the fileLastModifiedDate to set
+     */
+    public void setFileLastModifiedDate(Timestamp fileLastModifiedDate) {
+        this.fileLastModifiedDate = fileLastModifiedDate;
+    }
+
+    public void setFileLastModifiedDate(FileTime lastModifiedTime) {
+        setFileLastModifiedDate(new Timestamp(lastModifiedTime.toMillis()));
     }
 
     /**

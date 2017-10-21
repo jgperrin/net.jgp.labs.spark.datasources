@@ -131,6 +131,9 @@ public class SparkBeanUtils {
         case "String":
             return DataTypes.StringType;
         case "Date":
+        case "date":
+            return DataTypes.DateType;
+        case "Timestamp":
             return DataTypes.TimestampType;
         case "short":
         case "Short":

@@ -16,8 +16,9 @@ import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.jgp.labs.spark.datasources.x.extlib.ExifUtils;
+import net.jgp.labs.spark.datasources.x.extlib.PhotoMetadata;
 import net.jgp.labs.spark.datasources.x.extlib.RecursiveExtensionFilteredLister;
-import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 import net.jgp.labs.spark.datasources.x.utils.Schema;
 import net.jgp.labs.spark.datasources.x.utils.SparkBeanUtils;
 
@@ -61,8 +62,7 @@ public class ExifDirectoryRelation extends BaseRelation
         PhotoMetadata photo;
 
         for (File photoToProcess : photosToProcess) {
-            photo = new PhotoMetadata();
-            photo.setFilename(photoToProcess.getAbsolutePath());
+            photo = ExifUtils.processFromFilename(photoToProcess.getAbsolutePath());
             list.add(photo);
         }
         return list;
