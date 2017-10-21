@@ -1,5 +1,6 @@
 package net.jgp.labs.spark.datasources.x.ds.exif;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.jgp.labs.spark.datasources.x.extlib.RecursiveExtensionFilteredLister;
 import net.jgp.labs.spark.datasources.x.model.PhotoMetadata;
 import net.jgp.labs.spark.datasources.x.utils.Schema;
 import net.jgp.labs.spark.datasources.x.utils.SparkBeanUtils;
@@ -22,9 +24,10 @@ import net.jgp.labs.spark.datasources.x.utils.SparkBeanUtils;
 public class ExifDirectoryRelation extends BaseRelation
         implements Serializable, TableScan {
     private static final long serialVersionUID = 4598175080399877334L;
-    private static Logger log = LoggerFactory.getLogger(ExifDirectoryRelation.class);
+    private static transient Logger log = LoggerFactory.getLogger(ExifDirectoryRelation.class);
     private SQLContext sqlContext;
     private Schema schema = null;
+    private RecursiveExtensionFilteredLister photoLister;
 
     @Override
     public RDD<Row> buildScan() {
@@ -53,13 +56,15 @@ public class ExifDirectoryRelation extends BaseRelation
      * @return
      */
     private List<PhotoMetadata> collectData() {
+        List<File> photosToProcess = this.photoLister.getFiles();
         List<PhotoMetadata> list = new ArrayList<PhotoMetadata>();
-        PhotoMetadata photo = new PhotoMetadata();
-        photo.setFilename("001");
-        list.add(photo);
-        photo = new PhotoMetadata();
-        photo.setFilename("002");
-        list.add(photo);
+        PhotoMetadata photo;
+
+        for (File photoToProcess : photosToProcess) {
+            photo = new PhotoMetadata();
+            photo.setFilename(photoToProcess.getAbsolutePath());
+            list.add(photo);
+        }
         return list;
     }
 
@@ -80,4 +85,7 @@ public class ExifDirectoryRelation extends BaseRelation
         this.sqlContext = sqlContext;
     }
 
+    public void setPhotoLister(RecursiveExtensionFilteredLister photoLister) {
+        this.photoLister = photoLister;
+    }
 }

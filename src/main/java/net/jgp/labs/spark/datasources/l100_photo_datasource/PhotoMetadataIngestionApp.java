@@ -15,11 +15,11 @@ public class PhotoMetadataIngestionApp {
                 .appName("EXIF to Dataset")
                 .master("local[*]").getOrCreate();
         
-        String importDirectory = "/Users/jgp/Pictures/All Photos/2010-2019/2016";
+        String importDirectory = "/Users/jgp/Pictures";
         
         Dataset<Row> df = spark.read()
                 .format("net.jgp.labs.spark.datasources.x.ds.exif.ExifDirectoryDataSource")
-                .option("recursive", "false")
+                .option("recursive", "true")
                 .option("limit", "500")
                 .option("extensions", "jpg,jpeg")
                 .load(importDirectory);

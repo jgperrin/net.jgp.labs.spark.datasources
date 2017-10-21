@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SparkBeanUtils {
-    private static Logger log = LoggerFactory.getLogger(SparkBeanUtils.class);
+    private static transient Logger log = LoggerFactory.getLogger(SparkBeanUtils.class);
 
     public static Schema getSchemaFromBean(Class<?> c) {
         Schema schema = new Schema();
