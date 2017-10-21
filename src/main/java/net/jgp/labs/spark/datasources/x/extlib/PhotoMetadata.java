@@ -5,9 +5,13 @@ import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.jgp.labs.spark.datasources.x.utils.SparkColumn;
 
 public class PhotoMetadata implements Serializable {
+    private static transient Logger log = LoggerFactory.getLogger(PhotoMetadata.class);
     private static final long serialVersionUID = -2589804417011601051L;
 
     private Timestamp dateTaken;
@@ -92,6 +96,13 @@ public class PhotoMetadata implements Serializable {
     }
 
     /**
+     * @return the geoZ
+     */
+    public float getGeoZ() {
+        return geoZ;
+    }
+
+    /**
      * @return the height
      */
     public int getHeight() {
@@ -126,6 +137,14 @@ public class PhotoMetadata implements Serializable {
         return width;
     }
 
+    public void setDateTaken(Date date) {
+        if (date == null) {
+            log.warn("Attempt to set a null date.");
+            return;
+        }
+        setDateTaken(new Timestamp(date.getTime()));
+    }
+
     /**
      * @param dateTaken
      *            the dateTaken to set
@@ -150,6 +169,10 @@ public class PhotoMetadata implements Serializable {
         this.extension = extension;
     }
 
+    public void setFileCreationDate(FileTime creationTime) {
+        setFileCreationDate(new Timestamp(creationTime.toMillis()));
+    }
+
     /**
      * @param fileCreationDate
      *            the fileCreationDate to set
@@ -158,8 +181,8 @@ public class PhotoMetadata implements Serializable {
         this.fileCreationDate = fileCreationDate;
     }
 
-    public void setFileCreationDate(FileTime creationTime) {
-        setFileCreationDate(new Timestamp(creationTime.toMillis()));
+    public void setFileLastAccessDate(FileTime lastAccessTime) {
+        setFileLastAccessDate(new Timestamp(lastAccessTime.toMillis()));
     }
 
     /**
@@ -170,8 +193,8 @@ public class PhotoMetadata implements Serializable {
         this.fileLastAccessDate = fileLastAccessDate;
     }
 
-    public void setFileLastAccessDate(FileTime lastAccessTime) {
-        setFileLastAccessDate(new Timestamp(lastAccessTime.toMillis()));
+    public void setFileLastModifiedDate(FileTime lastModifiedTime) {
+        setFileLastModifiedDate(new Timestamp(lastModifiedTime.toMillis()));
     }
 
     /**
@@ -180,10 +203,6 @@ public class PhotoMetadata implements Serializable {
      */
     public void setFileLastModifiedDate(Timestamp fileLastModifiedDate) {
         this.fileLastModifiedDate = fileLastModifiedDate;
-    }
-
-    public void setFileLastModifiedDate(FileTime lastModifiedTime) {
-        setFileLastModifiedDate(new Timestamp(lastModifiedTime.toMillis()));
     }
 
     /**
@@ -208,6 +227,14 @@ public class PhotoMetadata implements Serializable {
      */
     public void setGeoY(float geoY) {
         this.geoY = geoY;
+    }
+
+    /**
+     * @param geoZ
+     *            the geoZ to set
+     */
+    public void setGeoZ(float geoZ) {
+        this.geoZ = geoZ;
     }
 
     /**
@@ -250,12 +277,4 @@ public class PhotoMetadata implements Serializable {
         this.width = width;
     }
 
-    public void setDateTaken(Date date) {
-        setDateTaken(new Timestamp(date.getTime()));
-    }
-
-    public void setGeoZ(float float1) {
-        // TODO Auto-generated method stub
-        
-    }
 }
