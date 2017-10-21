@@ -85,10 +85,24 @@ public class ExifUtils {
         if (gpsDirectory != null) {
             try {
                 photo.setGeoX(getDecimalCoordinatesAsFloat(gpsDirectory.getString(1), gpsDirectory.getRationalArray(2)));
-                photo.setGeoY(getDecimalCoordinatesAsFloat(gpsDirectory.getString(3), gpsDirectory.getRationalArray(4)));
-                photo.setGeoZ(gpsDirectory.getRational(6).floatValue());
             } catch (Exception e) {
-                log.warn("Issue while extracting GPS info from {}. Got {} ({}). Ignoring GPS info.", absolutePathToPhoto,
+                log.warn("Issue while extracting latitude GPS info from {}. Got {} ({}). Ignoring GPS info.", absolutePathToPhoto,
+                        e.getMessage(), e.getClass().getName());
+            }
+            try {
+                photo.setGeoY(getDecimalCoordinatesAsFloat(gpsDirectory.getString(3), gpsDirectory.getRationalArray(4)));
+            } catch (Exception e) {
+                log.warn("Issue while extracting longitude GPS info from {}. Got {} ({}). Ignoring GPS info.",
+                        absolutePathToPhoto,
+                        e.getMessage(), e.getClass().getName());
+            }
+            try {
+                Rational r = gpsDirectory.getRational(6);
+                if (r != null) {
+                    photo.setGeoZ(1f * r.getNumerator() / r.getDenominator());
+                }
+            } catch (Exception e) {
+                log.warn("Issue while extracting altitude GPS info from {}. Got {} ({}). Ignoring GPS info.", absolutePathToPhoto,
                         e.getMessage(), e.getClass().getName());
             }
         }
@@ -97,7 +111,8 @@ public class ExifUtils {
 
     private static float getDecimalCoordinatesAsFloat(String orientation, Rational[] coordinates) {
         if (orientation == null) {
-            log.error("GPS orientation is null, should be N, S, E, or W.");
+            log.error("GPS orientation is null, should be N, S, E, or W. However got {} {} {}.", coordinates[0], coordinates[1],
+                    coordinates[2]);
             return 0;
         }
         if (coordinates == null) {
