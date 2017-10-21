@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
+import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
@@ -83,19 +84,33 @@ public class ExifUtils {
         Directory gpsDirectory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
         if (gpsDirectory != null) {
             try {
-                photo.setGeoX(gpsDirectory.getFloat(2));
-                photo.setGeoY(gpsDirectory.getFloat(4));
-                photo.setGeoZ(gpsDirectory.getFloat(6));
-            } catch (MetadataException e) {
-                log.warn("Issue while extracting GPS info from {}. Got {}. Ignoring GPS info.", absolutePathToPhoto,
-                        e.getMessage());
+                photo.setGeoX(getDecimalCoordinatesAsFloat(gpsDirectory.getString(1), gpsDirectory.getRationalArray(2)));
+                photo.setGeoY(getDecimalCoordinatesAsFloat(gpsDirectory.getString(3), gpsDirectory.getRationalArray(4)));
+                photo.setGeoZ(gpsDirectory.getRational(6).floatValue());
+            } catch (Exception e) {
+                log.warn("Issue while extracting GPS info from {}. Got {} ({}). Ignoring GPS info.", absolutePathToPhoto,
+                        e.getMessage(), e.getClass().getName());
             }
         }
-
-        // photo.setGeoX(geoX);
-        // photo.setGeoY(geoY);
-
         return photo;
     }
 
+    private static float getDecimalCoordinatesAsFloat(String orientation, Rational[] coordinates) {
+        if (orientation == null) {
+            log.error("GPS orientation is null, should be N, S, E, or W.");
+            return 0;
+        }
+        if (coordinates == null) {
+            log.error("GPS coordinates are null.");
+            return 0;
+        }
+        float m = 1;
+        if (orientation.toUpperCase().charAt(0) == 'S' || orientation.toUpperCase().charAt(0) == 'W') {
+            m = -1;
+        }
+        float deg = coordinates[0].getNumerator() / coordinates[0].getDenominator();
+        float min = coordinates[1].getNumerator() * 60 * coordinates[2].getDenominator();
+        float sec = coordinates[2].getNumerator();
+        return m * (deg + (min + sec) / 3600 / coordinates[2].getDenominator());
+    }
 }
