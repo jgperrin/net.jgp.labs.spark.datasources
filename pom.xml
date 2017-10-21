@@ -52,6 +52,15 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+    <!-- Metadata -->
+    <dependency>
+      <groupId>com.drewnoakes</groupId>
+      <artifactId>metadata-extractor</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+    
+    <!-- Tests -->		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
