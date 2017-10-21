@@ -3,6 +3,7 @@ package net.jgp.labs.spark.datasources.x.extlib;
 import java.io.Serializable;
 import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
+import java.util.Date;
 
 import net.jgp.labs.spark.datasources.x.utils.SparkColumn;
 
@@ -18,6 +19,7 @@ public class PhotoMetadata implements Serializable {
     private String filename;
     private float geoX;
     private float geoY;
+    private float geoZ;
     private int height;
     private String mimeType;
     private String name;
@@ -246,5 +248,14 @@ public class PhotoMetadata implements Serializable {
      */
     public void setWidth(int width) {
         this.width = width;
+    }
+
+    public void setDateTaken(Date date) {
+        setDateTaken(new Timestamp(date.getTime()));
+    }
+
+    public void setGeoZ(float float1) {
+        // TODO Auto-generated method stub
+        
     }
 }
