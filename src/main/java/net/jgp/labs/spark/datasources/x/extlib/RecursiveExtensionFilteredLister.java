@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RecursiveExtensionFilteredLister implements Serializable {
+    @SuppressWarnings("unused")
     private static transient Logger log = LoggerFactory
             .getLogger(RecursiveExtensionFilteredLister.class);
     private static final long serialVersionUID = -5751014237854623589L;
