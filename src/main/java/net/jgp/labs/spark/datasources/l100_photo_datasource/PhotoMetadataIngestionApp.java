@@ -15,14 +15,16 @@ public class PhotoMetadataIngestionApp {
                 .appName("EXIF to Dataset")
                 .master("local[*]").getOrCreate();
         
-        String importDirectory = "/Users/jgp/Pictures";//All Photos/Photos/Photos Nathaniel";
+        String importDirectory = "/Users/jgp/Pictures";
         
         Dataset<Row> df = spark.read()
-                .format("net.jgp.labs.spark.datasources.x.ds.exif.ExifDirectoryDataSource")
+                .format("exif")
                 .option("recursive", "true")
                 .option("limit", "80000")
                 .option("extensions", "jpg,jpeg")
                 .load(importDirectory);
+        
+        // We can start analytics
         df = df
                 .filter(df.col("GeoX").isNotNull())
                 .filter(df.col("GeoZ").notEqual("NaN"))
