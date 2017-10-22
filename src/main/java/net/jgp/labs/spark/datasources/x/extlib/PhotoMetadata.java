@@ -21,9 +21,9 @@ public class PhotoMetadata implements Serializable {
     private Timestamp fileLastAccessDate;
     private Timestamp fileLastModifiedDate;
     private String filename;
-    private float geoX;
-    private float geoY;
-    private float geoZ;
+    private Float geoX;
+    private Float geoY;
+    private Float geoZ;
     private int height;
     private String mimeType;
     private String name;
@@ -84,21 +84,21 @@ public class PhotoMetadata implements Serializable {
     /**
      * @return the geoX
      */
-    public float getGeoX() {
+    public Float getGeoX() {
         return geoX;
     }
 
     /**
      * @return the geoY
      */
-    public float getGeoY() {
+    public Float getGeoY() {
         return geoY;
     }
 
     /**
      * @return the geoZ
      */
-    public float getGeoZ() {
+    public Float getGeoZ() {
         return geoZ;
     }
 
@@ -217,7 +217,7 @@ public class PhotoMetadata implements Serializable {
      * @param geoX
      *            the geoX to set
      */
-    public void setGeoX(float geoX) {
+    public void setGeoX(Float geoX) {
         this.geoX = geoX;
     }
 
@@ -225,7 +225,7 @@ public class PhotoMetadata implements Serializable {
      * @param geoY
      *            the geoY to set
      */
-    public void setGeoY(float geoY) {
+    public void setGeoY(Float geoY) {
         this.geoY = geoY;
     }
 
@@ -233,7 +233,7 @@ public class PhotoMetadata implements Serializable {
      * @param geoZ
      *            the geoZ to set
      */
-    public void setGeoZ(float geoZ) {
+    public void setGeoZ(Float geoZ) {
         this.geoZ = geoZ;
     }
 

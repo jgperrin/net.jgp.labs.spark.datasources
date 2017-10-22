@@ -15,7 +15,7 @@ public class PhotoMetadataIngestionApp {
                 .appName("EXIF to Dataset")
                 .master("local[*]").getOrCreate();
         
-        String importDirectory = "/Users/jgp/Pictures";
+        String importDirectory = "/Users/jgp/Pictures";//All Photos/Photos/Photos Nathaniel";
         
         Dataset<Row> df = spark.read()
                 .format("net.jgp.labs.spark.datasources.x.ds.exif.ExifDirectoryDataSource")
@@ -23,11 +23,14 @@ public class PhotoMetadataIngestionApp {
                 .option("limit", "80000")
                 .option("extensions", "jpg,jpeg")
                 .load(importDirectory);
-        df = df.filter(df.col("GeoX").notEqual(0)).filter(df.col("GeoZ").notEqual("NaN")).orderBy(df.col("GeoZ").desc());
+        df = df
+                .filter(df.col("GeoX").isNotNull())
+                .filter(df.col("GeoZ").notEqual("NaN"))
+                .orderBy(df.col("GeoZ").desc());
         
         System.out.println("I have imported " + df.count() + " photos.");
         df.printSchema();
-        df.show();
+        df.show(300);
         
         return true;
     }

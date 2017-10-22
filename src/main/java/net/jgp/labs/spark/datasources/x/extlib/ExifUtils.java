@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
@@ -78,17 +79,21 @@ public class ExifUtils {
 
         Directory exifSubIFDDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
         if (exifSubIFDDirectory != null) {
-            photo.setDateTaken(exifSubIFDDirectory.getDate(36867, TimeZone.getTimeZone("EST")));
+            Date d = exifSubIFDDirectory.getDate(36867, TimeZone.getTimeZone("EST"));
+            if (d != null) {
+                photo.setDateTaken(d);
+            }
         }
 
         Directory gpsDirectory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
         if (gpsDirectory != null) {
-            try {
-                photo.setGeoX(getDecimalCoordinatesAsFloat(gpsDirectory.getString(1), gpsDirectory.getRationalArray(2)));
-            } catch (Exception e) {
-                log.warn("Issue while extracting latitude GPS info from {}. Got {} ({}). Ignoring GPS info.", absolutePathToPhoto,
-                        e.getMessage(), e.getClass().getName());
-            }
+            // try {
+            photo.setGeoX(getDecimalCoordinatesAsFloat(gpsDirectory.getString(1), gpsDirectory.getRationalArray(2)));
+            // } catch (Exception e) {
+            // log.warn("Issue while extracting latitude GPS info from {}. Got {} ({}).
+            // Ignoring GPS info.", absolutePathToPhoto,
+            // e.getMessage(), e.getClass().getName());
+            // }
             try {
                 photo.setGeoY(getDecimalCoordinatesAsFloat(gpsDirectory.getString(3), gpsDirectory.getRationalArray(4)));
             } catch (Exception e) {
@@ -109,16 +114,21 @@ public class ExifUtils {
         return photo;
     }
 
-    private static float getDecimalCoordinatesAsFloat(String orientation, Rational[] coordinates) {
+    private static Float getDecimalCoordinatesAsFloat(String orientation, Rational[] coordinates) {
         if (orientation == null) {
-            log.error("GPS orientation is null, should be N, S, E, or W. However got {} {} {}.", coordinates[0], coordinates[1],
-                    coordinates[2]);
-            return 0;
+            log.debug("GPS orientation is null, should be N, S, E, or W.");
+            return null;
         }
         if (coordinates == null) {
-            log.error("GPS coordinates are null.");
-            return 0;
+            log.debug("GPS coordinates are null.");
+            return null;
         }
+        if (coordinates[0].getDenominator() == 0 || coordinates[1].getDenominator() == 0
+                || coordinates[2].getDenominator() == 0) {
+            log.debug("Invalid GPS coordinates (denominator should not be 0).");
+            return null;
+        }
+
         float m = 1;
         if (orientation.toUpperCase().charAt(0) == 'S' || orientation.toUpperCase().charAt(0) == 'W') {
             m = -1;
@@ -126,6 +136,7 @@ public class ExifUtils {
         float deg = coordinates[0].getNumerator() / coordinates[0].getDenominator();
         float min = coordinates[1].getNumerator() * 60 * coordinates[2].getDenominator();
         float sec = coordinates[2].getNumerator();
-        return m * (deg + (min + sec) / 3600 / coordinates[2].getDenominator());
+        float den = 3600 * coordinates[1].getDenominator() * coordinates[2].getDenominator();
+        return m * (deg + (min + sec) / den);
     }
 }
