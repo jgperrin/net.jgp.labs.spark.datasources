@@ -20,7 +20,7 @@ public class PhotoMetadataIngestionApp {
         Dataset<Row> df = spark.read()
                 .format("exif")
                 .option("recursive", "true")
-                .option("limit", "80000")
+                .option("limit", "100000")
                 .option("extensions", "jpg,jpeg")
                 .load(importDirectory);
         
@@ -29,10 +29,11 @@ public class PhotoMetadataIngestionApp {
                 .filter(df.col("GeoX").isNotNull())
                 .filter(df.col("GeoZ").notEqual("NaN"))
                 .orderBy(df.col("GeoZ").desc());
-        
+        df.collect();
+        df.cache();
         System.out.println("I have imported " + df.count() + " photos.");
         df.printSchema();
-        df.show(300);
+        df.show(5);
         
         return true;
     }
